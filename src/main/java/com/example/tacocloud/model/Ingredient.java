@@ -1,12 +1,20 @@
 package com.example.tacocloud.model;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.lang.reflect.Type;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Data
+@Table
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE, force=true)
+
 public class Ingredient {
 
+    @Id
     private final String id;
 
     private final String name;
