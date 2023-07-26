@@ -1,5 +1,6 @@
 package com.example.tacocloud.config;
 
+import com.example.tacocloud.model.User;
 import com.example.tacocloud.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,24 +23,36 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepo) {
         return username -> {
-            var user = userRepo.findByUsername(username);
-            if (user != null) return user;
-            throw new UsernameNotFoundException("User ‘" + username + "’ not found");
+            User user = userRepo.findByUsername(username);
+            if (user != null) {
+                return user;
+            }
+            throw new UsernameNotFoundException(
+                    "User '" + username + "' not found");
         };
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .authorizeHttpRequests()
-                .requestMatchers("/design", "/orders").hasRole("USER")
-                .requestMatchers("/", "/**").permitAll()
+                .authorizeRequests()
+                .mvcMatchers("/design", "/orders").hasRole("USER")
+                .anyRequest().permitAll()
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                .defaultSuccessUrl("/design")
                 .and()
                 .logout()
+                .logoutSuccessUrl("/")
+                // Make H2-Console non-secured; for debug purposes
+                .and()
+                .csrf()
+                .ignoringAntMatchers("/h2-console/**")
+                // Allow pages to be loaded in frames from the same origin; needed for H2-Console
+                .and()
+                .headers()
+                .frameOptions()
+                .sameOrigin()
                 .and()
                 .build();
     }
