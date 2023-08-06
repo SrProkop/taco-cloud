@@ -5,6 +5,7 @@ import com.example.tacocloud.model.Taco;
 import com.example.tacocloud.model.User;
 import com.example.tacocloud.repository.IngredientRepository;
 import com.example.tacocloud.repository.TacoRepository;
+import com.example.tacocloud.repository.UserAuthRepository;
 import com.example.tacocloud.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +25,8 @@ public class DevelopmentConfig {
             IngredientRepository repo,
             UserRepository userRepo,
             PasswordEncoder encoder,
-            TacoRepository tacoRepo) {
+            TacoRepository tacoRepo,
+            UserAuthRepository repoAuth) {
         return args -> {
             Ingredient flourTortilla = new Ingredient(
                     "FLTO", "Flour Tortilla", Type.WRAP);
@@ -81,6 +83,11 @@ public class DevelopmentConfig {
                     flourTortilla, cornTortilla, tomatoes,
                     lettuce, salsa));
             tacoRepo.save(taco3);
+
+            repoAuth.save(
+                    new UserAuth("habuma", encoder.encode("password"), "ROLE_ADMIN"));
+            repoAuth.save(
+                    new UserAuth("tacochef", encoder.encode("password"), "ROLE_ADMIN"));
         };
     }
 

@@ -1,7 +1,7 @@
 package com.example.tacocloud.config;
 
 import com.example.tacocloud.model.User;
-import com.example.tacocloud.repository.UserRepository;
+import com.example.tacocloud.repository.UserAuthRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,9 +21,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepo) {
+    public UserDetailsService userDetailsService(UserAuthRepository userRepo) {
         return username -> {
-            User user = userRepo.findByUsername(username);
+            UserAuth user = userRepo.findByUsername(username);
             if (user != null) {
                 return user;
             }
@@ -55,5 +55,15 @@ public class SecurityConfig {
                 .sameOrigin()
                 .and()
                 .build();
+    }
+
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .authorizeRequests(authorizeRequests ->
+                        authorizeRequests.anyRequest().authenticated()
+                )
+                .formLogin()
+                .and().build();
     }
 }
